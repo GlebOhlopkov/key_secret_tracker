@@ -29,10 +29,6 @@ class SecretCreateAPIView(generics.CreateAPIView):
         key = request.data['key']
         encrypt_key = cryptocode.encrypt(key, crypto_password)
         request.data['key'] = encrypt_key
-        # Create special {secret_key} for view/open the Secret
-        secret_key = encrypt_key[0:25]
-        secret_key = replace_symbols(secret_key)
-        request.data['secret_key'] = secret_key
 
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -41,6 +37,14 @@ class SecretCreateAPIView(generics.CreateAPIView):
 
         return Response(serializer.data['secret_key'], status=status.HTTP_201_CREATED, headers=headers)
 
+    def perform_create(self, serializer):
+        secret = serializer.save()
+
+        # Create special {secret_key} for view/open the Secret
+        secret_key = secret.key[0:25]
+        secret.secret_key = replace_symbols(secret_key)
+
+        secret.save()
 
 class SecretDetailAPIView(generics.RetrieveAPIView):
     """

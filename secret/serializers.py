@@ -5,6 +5,7 @@ from secret.models import Secret
 
 
 class SecretSerializer(serializers.ModelSerializer):
+    secret_key = serializers.CharField(read_only=True)
 
     class Meta:
         model = Secret
